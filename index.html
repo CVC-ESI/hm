@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تست IP و دامنه‌ها</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            color: #5b5b5b;
+        }
+        .input-box {
+            margin-bottom: 15px;
+        }
+        .input-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .output-box {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+        }
+        .output-box pre {
+            margin: 0;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .cloudflare {
+            color: #ff6600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>تست دامنه و IP</h1>
+    <div class="input-box">
+        <input type="text" id="domains" placeholder="دامنه‌ها را وارد کنید، از کاما جدا کنید (مثال: example1.com, example2.com)">
+    </div>
+    <button class="btn" onclick="checkDomains()">تست دامنه‌ها</button>
+    
+    <div class="output-box" id="output"></div>
+</div>
+
+<script>
+    async function checkDomains() {
+        let domains = document.getElementById('domains').value;
+        let domainList = domains.split(',');
+
+        let output = document.getElementById('output');
+        output.innerHTML = 'در حال پردازش...';
+
+        let result = '';
+        
+        for (let domain of domainList) {
+            domain = domain.trim();
+            try {
+                let response = await fetch(`https://api.ipify.org?domain=${domain}`);
+                let data = await response.json();
+                let ip = data.ip;
+
+                // بررسی Cloudflare
+                let isCloudflare = await checkCloudflare(domain);
+
+                result += `دامنه: ${domain} | IP: ${ip} ${isCloudflare ? '<span class="cloudflare">(Cloudflare)</span>' : ''}\n`;
+            } catch (error) {
+                result += `خطا در تست دامنه ${domain}\n`;
+            }
+        }
+
+        output.innerHTML = `<pre>${result}</pre>`;
+    }
+
+    async function checkCloudflare(domain) {
+        try {
+            let response = await fetch(`https://www.cloudflare.com/cdn-cgi/trace?domain=${domain}`);
+            let data = await response.text();
+            return data.includes('cf-ray');
+        } catch (error) {
+            return false;
+        }
+    }
+</script>
+
+</body>
+</html>
