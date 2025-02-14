@@ -100,7 +100,7 @@
                 let ip = data.Answer ? data.Answer[0].data : 'IP پیدا نشد';
 
                 // بررسی Cloudflare
-                let isCloudflare = await checkCloudflare(domain);
+                let isCloudflare = await checkCloudflare(ip);
 
                 if (isCloudflare) {
                     result += `دامنه: ${domain} | IP: ${ip} <span class="cloudflare">(Cloudflare)</span>\n`;
@@ -113,18 +113,13 @@
         output.innerHTML = `<pre>${result}</pre>`;
     }
 
-    async function checkCloudflare(domain) {
+    async function checkCloudflare(ip) {
         try {
-            // بررسی رکورد DNS برای شناسایی Cloudflare
-            let response = await fetch(`https://dns.google/resolve?name=${domain}&type=NS`);
+            // ارسال درخواست به سرویس IPinfo برای بررسی اینکه آیا IP متعلق به Cloudflare است یا نه
+            let response = await fetch(`https://ipinfo.io/${ip}/json`);
             let data = await response.json();
-            let nameservers = data.Answer ? data.Answer.map(item => item.data) : [];
-            // اینجا علاوه بر nameserver، بررسی رکوردهای A و AAAA برای IPهایی که متعلق به Cloudflare هستند انجام می‌شود
-            let ipResponse = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
-            let ipData = await ipResponse.json();
-            let ipAddresses = ipData.Answer ? ipData.Answer.map(item => item.data) : [];
-            // اگر IP مربوط به Cloudflare باشد (مراجعه به IPهایی که Cloudflare در آنها استفاده می‌کند)
-            return ipAddresses.some(ip => ip.includes('104.') || ip.includes('172.') || ip.includes('192.'));
+            // بررسی اینکه IP در محدوده‌های Cloudflare است یا نه
+            return data.org && data.org.includes("Cloudflare");
         } catch (error) {
             return false;
         }
