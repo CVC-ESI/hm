@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تست IP و دامنه‌ها</title>
+    <title>تست دامنه و IP</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -91,7 +91,7 @@
 
         let result = '';
         let successCount = 0; // شمارش تعداد کانفیگ‌های موفق
-        let allIps = []; // آرایه برای ذخیره IPهای Cloudflare
+        let allDomains = []; // آرایه برای ذخیره دامنه‌های Cloudflare
         let errorDomains = []; // آرایه برای ذخیره دامنه‌های با خطا
 
         // محدود کردن تعداد درخواست‌ها به 10 تا در هر زمان
@@ -114,9 +114,9 @@
                 for (let ip of ips) {
                     let isCloudflare = await checkCloudflare(ip);
                     if (isCloudflare) {
-                        allIps.push(ip); // اضافه کردن IP به آرایه
+                        allDomains.push(domain); // اضافه کردن دامنه به آرایه
                         successCount++; // افزایش تعداد کانفیگ موفق
-                        result += `دامنه: ${domain} | IP: ${ip} <span class="cloudflare">(Cloudflare)</span>\n`;
+                        break; // اگر یک IP مرتبط با Cloudflare پیدا شد، نیازی به بررسی بیشتر نیست
                     }
                 }
             } catch (error) {
@@ -141,11 +141,11 @@
             await Promise.all(queue);
         }
 
-        // تبدیل IPها به یک رشته و کپی کردن آن به کلیپ‌بورد
-        let ipsToCopy = allIps.join(', ');
-        if (ipsToCopy) {
-            await navigator.clipboard.writeText(ipsToCopy);
-            result += `\nIPهای کپی شده: ${ipsToCopy}`;
+        // تبدیل دامنه‌ها به یک رشته و کپی کردن آن به کلیپ‌بورد
+        let domainsToCopy = allDomains.join(', ');
+        if (domainsToCopy) {
+            await navigator.clipboard.writeText(domainsToCopy);
+            result += `\nدامنه‌های کپی شده: ${domainsToCopy}`;
         }
 
         result += `\nتعداد کانفیگ‌های موفق: ${successCount}`;
