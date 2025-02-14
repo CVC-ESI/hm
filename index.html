@@ -72,7 +72,7 @@
 <body>
 
 <div class="container">
-    <h1>تت دامنه و IP</h1>
+    <h1>تست دامنه و IP</h1>
     <div class="input-box">
         <input type="text" id="domains" placeholder="دامنه‌ها را وارد کنید، از کاما جدا کنید (مثال: example1.com, example2.com)">
     </div>
@@ -94,9 +94,10 @@
         for (let domain of domainList) {
             domain = domain.trim();
             try {
-                let response = await fetch(`https://api.ipify.org?domain=${domain}`);
+                // درخواست برای دریافت IP
+                let response = await fetch(`https://dns.google/resolve?name=${domain}`);
                 let data = await response.json();
-                let ip = data.ip;
+                let ip = data.Answer ? data.Answer[0].data : 'IP پیدا نشد';
 
                 // بررسی Cloudflare
                 let isCloudflare = await checkCloudflare(domain);
@@ -112,9 +113,11 @@
 
     async function checkCloudflare(domain) {
         try {
-            let response = await fetch(`https://www.cloudflare.com/cdn-cgi/trace?domain=${domain}`);
-            let data = await response.text();
-            return data.includes('cf-ray');
+            // بررسی رکورد DNS برای شناسایی Cloudflare
+            let response = await fetch(`https://dns.google/resolve?name=${domain}&type=NS`);
+            let data = await response.json();
+            let nameservers = data.Answer ? data.Answer.map(item => item.data) : [];
+            return nameservers.some(ns => ns.includes('cloudflare'));
         } catch (error) {
             return false;
         }
