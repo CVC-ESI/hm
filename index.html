@@ -102,7 +102,9 @@
                 // بررسی Cloudflare
                 let isCloudflare = await checkCloudflare(domain);
 
-                result += `دامنه: ${domain} | IP: ${ip} ${isCloudflare ? '<span class="cloudflare">(Cloudflare)</span>' : ''}\n`;
+                if (isCloudflare) {
+                    result += `دامنه: ${domain} | IP: ${ip} <span class="cloudflare">(Cloudflare)</span>\n`;
+                }
             } catch (error) {
                 result += `خطا در تست دامنه ${domain}\n`;
             }
@@ -117,7 +119,12 @@
             let response = await fetch(`https://dns.google/resolve?name=${domain}&type=NS`);
             let data = await response.json();
             let nameservers = data.Answer ? data.Answer.map(item => item.data) : [];
-            return nameservers.some(ns => ns.includes('cloudflare'));
+            // اینجا علاوه بر nameserver، بررسی رکوردهای A و AAAA برای IPهایی که متعلق به Cloudflare هستند انجام می‌شود
+            let ipResponse = await fetch(`https://dns.google/resolve?name=${domain}&type=A`);
+            let ipData = await ipResponse.json();
+            let ipAddresses = ipData.Answer ? ipData.Answer.map(item => item.data) : [];
+            // اگر IP مربوط به Cloudflare باشد (مراجعه به IPهایی که Cloudflare در آنها استفاده می‌کند)
+            return ipAddresses.some(ip => ip.includes('104.') || ip.includes('172.') || ip.includes('192.'));
         } catch (error) {
             return false;
         }
