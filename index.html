@@ -85,40 +85,72 @@
     async function checkDomains() {
         let domains = document.getElementById('domains').value;
         let domainList = domains.split(',');
-        
+
         let output = document.getElementById('output');
         output.innerHTML = 'در حال پردازش...';
 
         let result = '';
         let successCount = 0; // شمارش تعداد کانفیگ‌های موفق
+        let allIps = []; // آرایه برای ذخیره IPهای Cloudflare
+        let errorDomains = []; // آرایه برای ذخیره دامنه‌های با خطا
 
-        // پردازش همزمان دامنه‌ها
-        let promises = domainList.map(async (domain) => {
+        // محدود کردن تعداد درخواست‌ها به 10 تا در هر زمان
+        let maxConcurrentRequests = 10;
+        let queue = [];
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        async function processDomain(domain) {
             domain = domain.trim();
             try {
                 // درخواست برای دریافت IP
                 let response = await fetch(`https://dns.google/resolve?name=${domain}`);
                 let data = await response.json();
-                let ip = data.Answer ? data.Answer[0].data : 'IP پیدا نشد';
+                let ips = data.Answer ? data.Answer.map(item => item.data) : ['IP پیدا نشد'];
 
-                // بررسی Cloudflare
-                let isCloudflare = await checkCloudflare(ip);
-
-                if (isCloudflare) {
-                    result += `دامنه: ${domain} | IP: ${ip} <span class="cloudflare">(Cloudflare)</span>\n`;
-                    // کپی IP به کلیپ‌بورد
-                    await navigator.clipboard.writeText(ip);
-                    successCount++; // افزایش تعداد کانفیگ موفق
+                // بررسی Cloudflare برای هر IP
+                for (let ip of ips) {
+                    let isCloudflare = await checkCloudflare(ip);
+                    if (isCloudflare) {
+                        allIps.push(ip); // اضافه کردن IP به آرایه
+                        successCount++; // افزایش تعداد کانفیگ موفق
+                        result += `دامنه: ${domain} | IP: ${ip} <span class="cloudflare">(Cloudflare)</span>\n`;
+                    }
                 }
             } catch (error) {
-                result += `خطا در تست دامنه ${domain}\n`;
+                errorDomains.push(domain);
+                result += `خطا در تست دامنه ${domain}: ${error.message}\n`;
             }
-        });
+        }
 
-        // منتظر تکمیل همه درخواست‌ها
-        await Promise.all(promises);
+        // پردازش دامنه‌ها به صورت همزمان
+        for (let i = 0; i < domainList.length; i++) {
+            // کنترل درخواست‌های همزمان
+            queue.push(processDomain(domainList[i]));
+            if (queue.length >= maxConcurrentRequests) {
+                await Promise.all(queue);
+                queue = [];
+                await delay(1000); // مکث برای جلوگیری از محدودیت‌های API
+            }
+        }
+
+        // پردازش باقی‌مانده درخواست‌ها
+        if (queue.length > 0) {
+            await Promise.all(queue);
+        }
+
+        // تبدیل IPها به یک رشته و کپی کردن آن به کلیپ‌بورد
+        let ipsToCopy = allIps.join(', ');
+        if (ipsToCopy) {
+            await navigator.clipboard.writeText(ipsToCopy);
+            result += `\nIPهای کپی شده: ${ipsToCopy}`;
+        }
 
         result += `\nتعداد کانفیگ‌های موفق: ${successCount}`;
+        result += `\nدامنه‌های دارای خطا: ${errorDomains.length > 0 ? errorDomains.join(', ') : 'هیچکدام'}`;
+
         output.innerHTML = `<pre>${result}</pre>`;
     }
 
