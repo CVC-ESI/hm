@@ -85,13 +85,15 @@
     async function checkDomains() {
         let domains = document.getElementById('domains').value;
         let domainList = domains.split(',');
-
+        
         let output = document.getElementById('output');
         output.innerHTML = 'در حال پردازش...';
 
         let result = '';
-        
-        for (let domain of domainList) {
+        let successCount = 0; // شمارش تعداد کانفیگ‌های موفق
+
+        // پردازش همزمان دامنه‌ها
+        let promises = domainList.map(async (domain) => {
             domain = domain.trim();
             try {
                 // درخواست برای دریافت IP
@@ -104,12 +106,19 @@
 
                 if (isCloudflare) {
                     result += `دامنه: ${domain} | IP: ${ip} <span class="cloudflare">(Cloudflare)</span>\n`;
+                    // کپی IP به کلیپ‌بورد
+                    await navigator.clipboard.writeText(ip);
+                    successCount++; // افزایش تعداد کانفیگ موفق
                 }
             } catch (error) {
                 result += `خطا در تست دامنه ${domain}\n`;
             }
-        }
+        });
 
+        // منتظر تکمیل همه درخواست‌ها
+        await Promise.all(promises);
+
+        result += `\nتعداد کانفیگ‌های موفق: ${successCount}`;
         output.innerHTML = `<pre>${result}</pre>`;
     }
 
