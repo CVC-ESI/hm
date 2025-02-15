@@ -13,7 +13,8 @@
             margin: 0;
             padding: 0;
             text-align: center;
-            overflow-x: hidden;
+            overflow: hidden; /* غیرفعال کردن اسکرول */
+            user-select: none; /* غیرفعال کردن انتخاب متن */
         }
 
         /* تنظیمات کلی دارک مود */
@@ -66,7 +67,7 @@
             background-color: #c0392b;
         }
 
-        /* استایل برای دایره بزرگ */
+        /* استایل برای دایره بزرگ (سه‌بعدی) */
         .coin-box {
             position: absolute;
             top: 50%;
@@ -79,16 +80,18 @@
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transform: translate(-50%, -50%) rotateX(20deg) rotateY(20deg);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease-in-out;
+            transform-style: preserve-3d;
         }
 
-        /* مربع سبز داخل دایره */
+        /* مربع خالی داخل دایره */
         .square {
             width: 50px;
             height: 50px;
-            background-color: #2ecc71;
+            background-color: transparent;
+            border: 5px solid #2ecc71;
             border-radius: 10px;
             transition: transform 0.2s ease-in-out;
         }
@@ -263,10 +266,12 @@
             }, 1000);
         }
 
-        // خروج از حساب کاربری
+        // خروج از حساب
         function logout() {
             localStorage.removeItem('username');
-            window.location.reload();
+            localStorage.setItem('usernames', JSON.stringify([]));
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('login-box').style.display = 'block';
         }
     </script>
 </body>
