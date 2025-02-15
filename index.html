@@ -84,8 +84,18 @@
             transition: transform 0.3s ease-in-out;
         }
 
-        .coin-box.clicked {
-            transform: scale(0.8);
+        /* مربع سبز داخل دایره */
+        .square {
+            width: 50px;
+            height: 50px;
+            background-color: #2ecc71;
+            border-radius: 10px;
+            transition: transform 0.2s ease-in-out;
+        }
+
+        /* انیمیشن خم شدن دایره */
+        .coin-box.clicked .square {
+            transform: scale(1.2);
         }
 
         /* انیمیشن عدد */
@@ -172,7 +182,7 @@
 
             <!-- دایره بزرگ وسط صفحه -->
             <div class="coin-box" onclick="addCoin(event)">
-                <div class="coin-icon">+</div>
+                <div class="square"></div>
             </div>
         </div>
     </div>
@@ -233,23 +243,20 @@
 
             // انیمیشن دایره
             const coinBox = document.querySelector('.coin-box');
-            const rect = coinBox.getBoundingClientRect();
-            const x = event.clientX - rect.left;
-            const y = event.clientY - rect.top;
-
+            const square = coinBox.querySelector('.square');
+            square.style.transform = 'scale(1.2)';
+            
             // ایجاد عدد +1 در موقعیت کلیک
             const numberElement = document.createElement('div');
             numberElement.classList.add('number-animation');
-            numberElement.style.left = `${x - 15}px`;
-            numberElement.style.top = `${y - 15}px`;
+            numberElement.style.left = `${event.clientX - 15}px`;
+            numberElement.style.top = `${event.clientY - 15}px`;
             numberElement.innerText = '+1';
             document.body.appendChild(numberElement);
 
-            // انیمیشن
-            coinBox.classList.add('clicked');
             setTimeout(() => {
-                coinBox.classList.remove('clicked');
-            }, 500);
+                square.style.transform = 'scale(1)';
+            }, 200);
 
             setTimeout(() => {
                 numberElement.remove();
