@@ -21,7 +21,95 @@
             background-color: #1f1f1f;
         }
 
-        /* استایل برای کادر شناسه */
+        /* استایل نوار بالای صفحه */
+        .nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            background-color: #2e3b4e;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            position: absolute;
+            top: 0;
+            width: 100%;
+        }
+
+        .nav-bar .username {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .nav-bar .coin-info {
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+
+        .nav-bar .coin-count {
+            margin-right: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .nav-bar .exit-btn {
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .nav-bar .exit-btn:hover {
+            background-color: #c0392b;
+        }
+
+        /* استایل برای دایره بزرگ */
+        .coin-box {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background-color: yellow;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .coin-box.clicked {
+            transform: scale(0.8);
+        }
+
+        /* انیمیشن عدد */
+        .number-animation {
+            position: absolute;
+            font-size: 30px;
+            color: white;
+            font-weight: bold;
+            transform: translateY(-20px);
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeOut {
+            0% {
+                opacity: 1;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-40px);
+            }
+        }
+
+        /* استایل کادر شناسه */
         .login-box {
             margin-top: 150px;
             display: inline-block;
@@ -62,117 +150,6 @@
             background-color: #9b59b6;
         }
 
-        /* استایل برای منو بالای صفحه */
-        .nav-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 30px;
-            background-color: #2e3b4e;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .nav-bar .username {
-            color: white;
-            font-size: 18px;
-        }
-
-        .nav-bar .coin-info {
-            display: flex;
-            align-items: center;
-            color: white;
-        }
-
-        .nav-bar .coin-icon {
-            margin-right: 10px;
-            width: 25px;
-            height: 25px;
-            background-color: gold;
-            border-radius: 50%;
-        }
-
-        .nav-bar .coin-count {
-            margin-right: 10px;
-            font-size: 20px;
-        }
-
-        .nav-bar .exit-btn {
-            background-color: red;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .nav-bar .exit-btn:hover {
-            background-color: #e74c3c;
-        }
-
-        /* استایل سکه بزرگ */
-        .coin-box {
-            width: 150px;
-            height: 150px;
-            background-color: #8e44ad;
-            border-radius: 50%;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-            transition: transform 0.4s ease-in-out;
-        }
-
-        .coin-box .coin-icon {
-            width: 60px;
-            height: 60px;
-            background-color: gold;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 32px;
-            color: white;
-            font-weight: bold;
-        }
-
-        .coin-box.clicked {
-            transform: scale(1.2) translateY(-50px);
-        }
-
-        /* استایل برای کادر شناسایی و داشبورد */
-        .content-container {
-            position: relative;
-        }
-
-        /* استایل برای نمایش سکه‌ها */
-        .coin-container {
-            margin-top: 30px;
-        }
-
-        .coin-container .coin-item {
-            display: inline-block;
-            margin: 0 10px;
-            padding: 15px;
-            background-color: #8e44ad;
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
-            font-size: 24px;
-            color: white;
-            text-align: center;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .coin-container .coin-item:hover {
-            background-color: #9b59b6;
-        }
-
     </style>
 </head>
 <body class="dark-mode">
@@ -188,20 +165,14 @@
             <div class="nav-bar">
                 <div class="username" id="usernameDisplay"></div>
                 <div class="coin-info">
-                    <div class="coin-icon"></div>
                     <div class="coin-count" id="coinCount">0</div>
                 </div>
                 <button class="exit-btn" onclick="logout()">خروج</button>
             </div>
 
-            <!-- سکه بزرگ وسط صفحه -->
-            <div class="coin-box" onclick="addCoin()">
-                <div class="coin-icon">S</div>
-            </div>
-
-            <!-- نمایش سکه‌ها -->
-            <div class="coin-container">
-                <div class="coin-item" onclick="addCoin()">+1</div>
+            <!-- دایره بزرگ وسط صفحه -->
+            <div class="coin-box" onclick="addCoin(event)">
+                <div class="coin-icon">+</div>
             </div>
         </div>
     </div>
@@ -253,19 +224,36 @@
         }
 
         // افزودن سکه به کاربر
-        function addCoin() {
+        function addCoin(event) {
             const username = document.getElementById('usernameDisplay').textContent;
             let userCoins = JSON.parse(localStorage.getItem(username)).coins;
             userCoins++;
             document.getElementById('coinCount').textContent = userCoins;
             localStorage.setItem(username, JSON.stringify({ coins: userCoins }));
 
-            // انیمیشن سکه
+            // انیمیشن دایره
             const coinBox = document.querySelector('.coin-box');
+            const rect = coinBox.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+
+            // ایجاد عدد +1 در موقعیت کلیک
+            const numberElement = document.createElement('div');
+            numberElement.classList.add('number-animation');
+            numberElement.style.left = `${x - 15}px`;
+            numberElement.style.top = `${y - 15}px`;
+            numberElement.innerText = '+1';
+            document.body.appendChild(numberElement);
+
+            // انیمیشن
             coinBox.classList.add('clicked');
             setTimeout(() => {
                 coinBox.classList.remove('clicked');
             }, 500);
+
+            setTimeout(() => {
+                numberElement.remove();
+            }, 1000);
         }
 
         // خروج از حساب کاربری
