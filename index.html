@@ -15,6 +15,7 @@
             text-align: center;
             overflow: hidden; /* غیرفعال کردن اسکرول */
             user-select: none; /* غیرفعال کردن انتخاب متن */
+            touch-action: none; /* غیرفعال کردن لمس و زوم */
         }
 
         /* تنظیمات کلی دارک مود */
@@ -27,24 +28,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 20px 30px;
+            padding: 15px 30px;
             background-color: #2e3b4e;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
             position: absolute;
             top: 0;
             width: 100%;
+            border-bottom: 2px solid #8e44ad;
+            font-size: 18px;
+            color: white;
         }
 
         .nav-bar .username {
-            color: white;
-            font-size: 18px;
             font-weight: bold;
         }
 
         .nav-bar .coin-info {
             display: flex;
             align-items: center;
-            color: white;
         }
 
         .nav-bar .coin-count {
@@ -72,33 +73,34 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 200px;
-            height: 200px;
+            width: 250px;
+            height: 250px;
             background-color: yellow;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             cursor: pointer;
-            transform: translate(-50%, -50%) rotateX(20deg) rotateY(20deg);
+            transform: translate(-50%, -50%) rotateX(30deg) rotateY(30deg);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
             transition: transform 0.3s ease-in-out;
             transform-style: preserve-3d;
+            position: relative;
         }
 
         /* مربع خالی داخل دایره */
         .square {
-            width: 50px;
-            height: 50px;
+            width: 70px;
+            height: 70px;
             background-color: transparent;
             border: 5px solid #2ecc71;
             border-radius: 10px;
-            transition: transform 0.2s ease-in-out;
+            transition: transform 0.3s ease-in-out;
         }
 
         /* انیمیشن خم شدن دایره */
-        .coin-box.clicked .square {
-            transform: scale(1.2);
+        .coin-box.clicked {
+            transform: translate(-50%, -50%) scale(0.9) rotateX(0deg) rotateY(0deg);
         }
 
         /* انیمیشن عدد */
@@ -247,7 +249,7 @@
             // انیمیشن دایره
             const coinBox = document.querySelector('.coin-box');
             const square = coinBox.querySelector('.square');
-            square.style.transform = 'scale(1.2)';
+            coinBox.classList.add('clicked');
             
             // ایجاد عدد +1 در موقعیت کلیک
             const numberElement = document.createElement('div');
@@ -258,18 +260,14 @@
             document.body.appendChild(numberElement);
 
             setTimeout(() => {
-                square.style.transform = 'scale(1)';
-            }, 200);
-
-            setTimeout(() => {
                 numberElement.remove();
+                coinBox.classList.remove('clicked');
             }, 1000);
         }
 
         // خروج از حساب
         function logout() {
             localStorage.removeItem('username');
-            localStorage.setItem('usernames', JSON.stringify([]));
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('login-box').style.display = 'block';
         }
