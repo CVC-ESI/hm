@@ -1,0 +1,138 @@
+/* تنظیمات عمومی */
+body {
+    background-color: #2f2f2f;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* حالت دارک مود */
+.dark-mode {
+    background-color: #1f1f1f;
+}
+
+/* استایل برای کادر شناسه */
+.login-box {
+    margin-top: 200px;
+    display: inline-block;
+    text-align: center;
+    padding: 30px;
+    background-color: #3b3b3b;
+    border-radius: 10px;
+}
+
+input {
+    width: 250px;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #8e44ad;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button:hover {
+    background-color: #9b59b6;
+}
+
+/* استایل منوی بالای صفحه */
+.nav-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: #2e3b4e;
+}
+
+.nav-bar .username {
+    color: white;
+}
+
+.nav-bar .coin-info {
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.nav-bar .coin-info .coin-icon {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    background-color: gold;
+    border-radius: 50%;
+}
+
+.nav-bar .coin-info .coin-count {
+    margin-right: 5px;
+}
+
+.nav-bar .exit-btn {
+    background-color: red;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* استایل سکه */
+.coin-box {
+    width: 100px;
+    height: 100px;
+    background-color: #8e44ad;
+    margin: 20px auto;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.coin-box .coin-icon {
+    width: 40px;
+    height: 40px;
+    background-color: gold;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    color: white;
+    font-weight: bold;
+}
+
+.coin-box .coin-icon::after {
+    content: '▲';
+    font-size: 18px;
+    color: white;
+    position: absolute;
+    bottom: 5px;
+}
+
+.coin-box.clicked .coin-icon {
+    animation: coinClick 1s forwards;
+}
+
+@keyframes coinClick {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: translateY(-50px) scale(1.5);
+    }
+    100% {
+        transform: scale(1);
+        transform: translateY(0);
+    }
+}
