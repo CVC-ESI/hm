@@ -267,7 +267,11 @@
 
         // خروج از حساب
         function logout() {
-            localStorage.removeItem('username');
+            const username = document.getElementById('usernameDisplay').textContent;
+            const existingUsernames = JSON.parse(localStorage.getItem('usernames')) || [];
+            const updatedUsernames = existingUsernames.filter(user => user !== username);
+            localStorage.setItem('usernames', JSON.stringify(updatedUsernames));
+
             document.getElementById('dashboard').style.display = 'none';
             document.getElementById('login-box').style.display = 'block';
         }
