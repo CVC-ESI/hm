@@ -1,171 +1,137 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تست دامنه و IP</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 500px;
-        }
-        h1 {
-            text-align: center;
-            color: #5b5b5b;
-        }
-        .input-box {
-            margin-bottom: 15px;
-        }
-        .input-box input {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        .btn {
-            background-color: #4CAF50;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-        }
-        .btn:hover {
-            background-color: #45a049;
-        }
-        .output-box {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            background-color: #f9f9f9;
-            border-radius: 4px;
-        }
-        .output-box pre {
-            margin: 0;
-            font-size: 14px;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-        }
-        .cloudflare {
-            color: #ff6600;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ورود کاربر</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #181818;
+      color: #dcdcdc;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .container {
+      background-color: #252525;
+      border-radius: 20px;
+      padding: 30px 40px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      width: 350px;
+      transition: all 0.3s ease-in-out;
+    }
+
+    .container:hover {
+      box-shadow: 0 6px 30px rgba(0, 0, 0, 0.8);
+      transform: translateY(-10px);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 20px;
+      color: #f5f5f5;
+    }
+
+    label {
+      display: block;
+      margin: 15px 0 5px;
+      font-size: 16px;
+      font-weight: 500;
+      color: #aaa;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 8px 0;
+      background-color: #333;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #e0e0e0;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    input:focus {
+      background-color: #444;
+      border-color: #5c6bc0;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #5c6bc0;
+      color: #fff;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #3f51b5;
+    }
+
+    #name-input-container {
+      display: none;
+      margin-top: 20px;
+    }
+
+    #submit-btn {
+      border-radius: 50px;
+    }
+  </style>
 </head>
 <body>
+  <div class="container">
+    <h1>ورود به حساب</h1>
+    <form id="login-form">
+      <label for="user-id">شناسه کاربری:</label>
+      <input type="text" id="user-id" name="user-id" placeholder="شناسه کاربری خود را وارد کنید" required>
 
-<div class="container">
-    <h1>تست دامنه و IP</h1>
-    <div class="input-box">
-        <input type="text" id="domains" placeholder="دامنه‌ها را وارد کنید، از کاما جدا کنید (مثال: example1.com, example2.com)">
-    </div>
-    <button class="btn" onclick="checkDomains()">تست دامنه‌ها</button>
-    
-    <div class="output-box" id="output"></div>
-</div>
+      <div id="name-input-container">
+        <label for="user-name">اسم شما:</label>
+        <input type="text" id="user-name" name="user-name" placeholder="اسم خود را وارد کنید" required>
+      </div>
 
-<script>
-    async function checkDomains() {
-        let domains = document.getElementById('domains').value;
-        let domainList = domains.split(',');
+      <button type="submit" id="submit-btn">تایید</button>
+    </form>
+  </div>
 
-        let output = document.getElementById('output');
-        output.innerHTML = 'در حال پردازش...';
+  <script>
+    document.getElementById("login-form").addEventListener("submit", function(event) {
+      event.preventDefault();
 
-        let result = '';
-        let successCount = 0; // شمارش تعداد کانفیگ‌های موفق
-        let allDomains = []; // آرایه برای ذخیره دامنه‌های Cloudflare
-        let errorDomains = []; // آرایه برای ذخیره دامنه‌های با خطا
+      let userId = document.getElementById("user-id").value;
+      let userName = document.getElementById("user-name") ? document.getElementById("user-name").value : null;
 
-        // محدود کردن تعداد درخواست‌ها به 10 تا در هر زمان
-        let maxConcurrentRequests = 10;
-        let queue = [];
+      // بررسی اینکه آیا برای این شناسه نامی ذخیره شده یا نه
+      let storedName = localStorage.getItem(userId);
 
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
+      if (storedName) {
+        // اگر نام ذخیره شده باشد، نشان دادن اسم
+        alert(`سلام ${storedName}`);
+      } else {
+        // اگر نام ذخیره نشده باشد، نمایش کادر نام
+        if (userName) {
+          // اگر نام وارد شد، ذخیره کردن آن
+          localStorage.setItem(userId, userName);
+          alert(`شناسه و اسم شما ذخیره شد!`);
+        } else {
+          // نمایش کادر وارد کردن اسم
+          document.getElementById("name-input-container").style.display = "block";
         }
-
-        async function processDomain(domain) {
-            domain = domain.trim();
-            try {
-                // درخواست برای دریافت IP
-                let response = await fetch(`https://dns.google/resolve?name=${domain}`);
-                let data = await response.json();
-                let ips = data.Answer ? data.Answer.map(item => item.data) : ['IP پیدا نشد'];
-
-                // بررسی Cloudflare برای هر IP
-                for (let ip of ips) {
-                    let isCloudflare = await checkCloudflare(ip);
-                    if (isCloudflare) {
-                        allDomains.push(domain); // اضافه کردن دامنه به آرایه
-                        successCount++; // افزایش تعداد کانفیگ موفق
-                        break; // اگر یک IP مرتبط با Cloudflare پیدا شد، نیازی به بررسی بیشتر نیست
-                    }
-                }
-            } catch (error) {
-                errorDomains.push(domain);
-                result += `خطا در تست دامنه ${domain}: ${error.message}\n`;
-            }
-        }
-
-        // پردازش دامنه‌ها به صورت همزمان
-        for (let i = 0; i < domainList.length; i++) {
-            // کنترل درخواست‌های همزمان
-            queue.push(processDomain(domainList[i]));
-            if (queue.length >= maxConcurrentRequests) {
-                await Promise.all(queue);
-                queue = [];
-                await delay(1000); // مکث برای جلوگیری از محدودیت‌های API
-            }
-        }
-
-        // پردازش باقی‌مانده درخواست‌ها
-        if (queue.length > 0) {
-            await Promise.all(queue);
-        }
-
-        // تبدیل دامنه‌ها به یک رشته و کپی کردن آن به کلیپ‌بورد
-        let domainsToCopy = allDomains.join(', ');
-        if (domainsToCopy) {
-            await navigator.clipboard.writeText(domainsToCopy);
-            result += `\nدامنه‌های کپی شده: ${domainsToCopy}`;
-        }
-
-        result += `\nتعداد کانفیگ‌های موفق: ${successCount}`;
-        result += `\nدامنه‌های دارای خطا: ${errorDomains.length > 0 ? errorDomains.join(', ') : 'هیچکدام'}`;
-
-        output.innerHTML = `<pre>${result}</pre>`;
-    }
-
-    async function checkCloudflare(ip) {
-        try {
-            // ارسال درخواست به سرویس IPinfo برای بررسی اینکه آیا IP متعلق به Cloudflare است یا نه
-            let response = await fetch(`https://ipinfo.io/${ip}/json`);
-            let data = await response.json();
-            // بررسی اینکه IP در محدوده‌های Cloudflare است یا نه
-            return data.org && data.org.includes("Cloudflare");
-        } catch (error) {
-            return false;
-        }
-    }
-</script>
-
+      }
+    });
+  </script>
 </body>
 </html>
