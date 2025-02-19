@@ -10,6 +10,7 @@
         ul { text-align: left; max-width: 600px; margin: auto; }
         .cloudflare { color: green; }
         .not-cloudflare { color: red; }
+        .error { color: red; }
     </style>
 </head>
 <body>
@@ -17,21 +18,12 @@
     <input type="number" id="count" placeholder="تعداد دامنه‌هایی که می‌خواهید تست کنید">
     <button onclick="startCheck()">بررسی دامنه‌ها</button>
     <ul id="resultList"></ul>
+    <p id="errorMsg" class="error" style="display: none;"></p>
 
     <script>
-        const API_KEY = "YOUR_GOOGLE_SEARCH_API_KEY"; // جایگزین کن
-        const CX = "YOUR_CUSTOM_SEARCH_ENGINE_ID"; // جایگزین کن
-
-        async function searchGoogleDomains(count) {
-            const query = "site:.com"; // می‌تونی پسوندهای دیگه هم اضافه کنی
-            const url = `https://www.googleapis.com/customsearch/v1?q=${query}&cx=${CX}&key=${API_KEY}&num=${count}`;
-            const response = await fetch(url);
-            const data = await response.json();
-            return data.items ? data.items.map(item => new URL(item.link).hostname) : [];
-        }
+        const cloudflareIPs = ["173.245.48", "103.21.244", "198.41.128", "104.16", "104.24"];
 
         async function checkCloudflare(domain) {
-            const cloudflareIPs = ["173.245.48", "103.21.244", "198.41.128", "104.16", "104.24"];
             try {
                 const response = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=A`, {
                     method: 'GET',
@@ -41,24 +33,48 @@
                 if (data.Answer) {
                     return data.Answer.some(answer => cloudflareIPs.some(cf => answer.data.startsWith(cf)));
                 }
-            } catch (e) { return false; }
+            } catch (e) {
+                console.error(`خطا در بررسی دامنه ${domain}: ${e}`);
+                return false;
+            }
             return false;
         }
 
+        function getRandomDomains(count) {
+            // اینجا دامنه‌های تصادفی ایجاد می‌کنیم
+            const domains = ["example.com", "cloudflare.com", "example.net", "google.com", "github.com"];
+            const randomDomains = [];
+            for (let i = 0; i < count; i++) {
+                randomDomains.push(domains[i % domains.length]);
+            }
+            return randomDomains;
+        }
+
         async function startCheck() {
-            const count = document.getElementById('count').value;
+            const count = parseInt(document.getElementById('count').value);
             const resultList = document.getElementById('resultList');
+            const errorMsg = document.getElementById('errorMsg');
             resultList.innerHTML = "در حال بررسی دامنه‌ها...";
+            errorMsg.style.display = 'none';
 
-            const domains = await searchGoogleDomains(count);
-            resultList.innerHTML = "";
+            try {
+                if (isNaN(count) || count <= 0) {
+                    throw new Error("لطفاً تعداد معتبری وارد کنید.");
+                }
 
-            for (let domain of domains) {
-                const isCloudflare = await checkCloudflare(domain);
-                const listItem = document.createElement('li');
-                listItem.textContent = domain;
-                listItem.classList.add(isCloudflare ? 'cloudflare' : 'not-cloudflare');
-                resultList.appendChild(listItem);
+                const domains = getRandomDomains(count); // دریافت دامنه‌های تصادفی
+                resultList.innerHTML = "";
+
+                for (let domain of domains) {
+                    const isCloudflare = await checkCloudflare(domain);
+                    const listItem = document.createElement('li');
+                    listItem.textContent = domain;
+                    listItem.classList.add(isCloudflare ? 'cloudflare' : 'not-cloudflare');
+                    resultList.appendChild(listItem);
+                }
+            } catch (e) {
+                errorMsg.textContent = e.message;
+                errorMsg.style.display = 'block';
             }
         }
     </script>
