@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloudflare Domain/IP Checker</title>
+    <title>Cloudflare Domain/IP Finder</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -25,7 +25,7 @@
             font-size: 24px;
             margin-bottom: 20px;
         }
-        input[type="text"] {
+        input[type="number"] {
             width: 100%;
             padding: 10px;
             font-size: 16px;
@@ -55,63 +55,92 @@
         .not-cloudflare {
             color: red;
         }
+        ul {
+            text-align: left;
+            list-style: none;
+            padding-left: 0;
+        }
+        li {
+            margin: 5px 0;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Cloudflare Domain/IP Checker</h1>
-        <input type="text" id="domain" placeholder="دامنه یا آی‌پی را وارد کنید..." />
-        <button onclick="checkCloudflare()">بررسی</button>
+        <h1>Cloudflare Domain/IP Finder</h1>
+        <input type="number" id="count" placeholder="تعداد دامنه‌هایی که می‌خواهید پیدا کنید..." />
+        <button onclick="findCloudflareDomains()">یافتن دامنه‌های Cloudflare</button>
         <div id="result" class="result"></div>
+        <ul id="domainList"></ul>
     </div>
 
     <script>
-        async function checkCloudflare() {
-            var domain = document.getElementById('domain').value;
+        async function findCloudflareDomains() {
+            var count = document.getElementById('count').value;
             var resultDiv = document.getElementById('result');
+            var domainList = document.getElementById('domainList');
+            domainList.innerHTML = ''; // Clear the list first
 
-            // آدرس برای درخواست اطلاعات از API (شبیه‌سازی برای چک کردن آی‌پی یا دامنه)
-            var apiUrl = `https://cloudflare-dns.com/dns-query?name=${domain}&type=A`;
+            // لیست آی‌پی‌های Cloudflare برای مقایسه
+            var cloudflareIps = [
+                "173.245.48.0", "103.21.244.0", "198.41.128.0", "104.16.0.0", "104.24.0.0"
+            ];
 
-            try {
-                // ارسال درخواست به API
-                const response = await fetch(apiUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/dns-json'
-                    }
-                });
+            // چک کردن تعداد دلخواه دامنه‌ها
+            for (let i = 0; i < count; i++) {
+                var domain = await getRandomDomain(); // از یک دامنه تصادفی استفاده می‌کنیم
 
-                const data = await response.json();
+                // درخواست برای بررسی دامنه
+                var apiUrl = `https://cloudflare-dns.com/dns-query?name=${domain}&type=A`;
 
-                if (data.Answer) {
-                    // بررسی آی‌پی‌ها و تطابق با آی‌پی‌های Cloudflare
-                    let isCloudflare = false;
-                    const cloudflareIPs = [
-                        "173.245.48.0", "103.21.244.0", "198.41.128.0", "104.16.0.0", "104.24.0.0"
-                    ];
+                try {
+                    const response = await fetch(apiUrl, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/dns-json'
+                        }
+                    });
+                    const data = await response.json();
 
-                    for (let answer of data.Answer) {
-                        let ip = answer.data;
-                        for (let cfIp of cloudflareIPs) {
-                            if (ip.startsWith(cfIp)) {
-                                isCloudflare = true;
-                                break;
+                    if (data.Answer) {
+                        let isCloudflare = false;
+                        for (let answer of data.Answer) {
+                            let ip = answer.data;
+                            for (let cfIp of cloudflareIps) {
+                                if (ip.startsWith(cfIp)) {
+                                    isCloudflare = true;
+                                    break;
+                                }
                             }
                         }
-                    }
 
-                    if (isCloudflare) {
-                        resultDiv.innerHTML = `<p class="cloudflare">دامنه یا آی‌پی از Cloudflare است!</p>`;
-                    } else {
-                        resultDiv.innerHTML = `<p class="not-cloudflare">دامنه یا آی‌پی از Cloudflare نیست.</p>`;
+                        // نمایش نتیجه
+                        if (isCloudflare) {
+                            var listItem = document.createElement('li');
+                            listItem.classList.add('cloudflare');
+                            listItem.textContent = `${domain} از Cloudflare استفاده می‌کند!`;
+                            domainList.appendChild(listItem);
+                        } else {
+                            var listItem = document.createElement('li');
+                            listItem.classList.add('not-cloudflare');
+                            listItem.textContent = `${domain} از Cloudflare استفاده نمی‌کند.`;
+                            domainList.appendChild(listItem);
+                        }
                     }
-                } else {
-                    resultDiv.innerHTML = `<p class="not-cloudflare">نتیجه‌ای پیدا نشد، بررسی کنید.</p>`;
+                } catch (error) {
+                    var listItem = document.createElement('li');
+                    listItem.classList.add('not-cloudflare');
+                    listItem.textContent = `خطا در بررسی دامنه ${domain}: ${error.message}`;
+                    domainList.appendChild(listItem);
                 }
-            } catch (error) {
-                resultDiv.innerHTML = `<p class="not-cloudflare">خطا در اتصال به API: ${error.message}</p>`;
             }
+        }
+
+        // شبیه‌سازی دامنه‌های تصادفی برای تست (در واقع این باید به یک API یا دیتابیس متصل باشد)
+        async function getRandomDomain() {
+            const domains = ['visa.cn', 'cloudflare.org', 'mie.org', 'example.com', 'test.com'];
+            const randomIndex = Math.floor(Math.random() * domains.length);
+            return domains[randomIndex];
         }
     </script>
 </body>
