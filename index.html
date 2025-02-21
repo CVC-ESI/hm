@@ -61,9 +61,12 @@
         function saveToken() {
             const token = document.getElementById('tokenInput').value;
             const messageElement = document.getElementById('message');
+            
+            // چک می‌کنیم که آیا توکن وارد شده است یا خیر
             if (token) {
-                // چک می‌کنیم که آیا قبلاً توکن ذخیره شده است یا نه
                 const storedToken = localStorage.getItem('token');
+                
+                // اگر توکن قبلاً ذخیره شده باشد
                 if (storedToken) {
                     messageElement.textContent = 'توکن قبلاً ذخیره شده است';
                 } else {
@@ -76,11 +79,12 @@
             }
         }
 
-        // چک کردن که آیا توکن قبلاً ذخیره شده یا نه
+        // چک می‌کنیم که آیا توکن قبلاً ذخیره شده است یا خیر
         window.onload = function() {
             const storedToken = localStorage.getItem('token');
+            const messageElement = document.getElementById('message');
             if (storedToken) {
-                document.getElementById('message').textContent = 'توکن قبلاً ذخیره شده است';
+                messageElement.textContent = 'توکن قبلاً ذخیره شده است';
             }
         };
     </script>
