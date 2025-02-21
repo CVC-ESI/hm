@@ -17,7 +17,7 @@
         }
         .token-box {
             padding: 20px;
-            border-radius: 25px; /* بیضی شکل */
+            border-radius: 25px; 
             background-color: #333;
             display: flex;
             flex-direction: column;
@@ -30,14 +30,14 @@
             padding: 10px;
             width: 80%;
             margin-bottom: 20px;
-            border-radius: 15px; /* بیضی شکل */
+            border-radius: 15px; 
             border: 1px solid #ccc;
             background-color: #444;
             color: white;
         }
         button {
             padding: 10px 20px;
-            border-radius: 15px; /* بیضی شکل */
+            border-radius: 15px;
             background-color: #555;
             border: none;
             color: white;
@@ -51,8 +51,8 @@
 </head>
 <body>
     <div class="token-box">
-        <h2>توکن</h2>
-        <input type="text" id="tokenInput" placeholder="توکن خود را وارد کنید">
+        <h2>‌</h2>
+        <input type="text" id="tokenInput" placeholder="توکن">
         <button onclick="saveToken()">ثبت</button>
         <p id="message"></p>
     </div>
@@ -62,13 +62,13 @@
             const token = document.getElementById('tokenInput').value;
             const messageElement = document.getElementById('message');
             
-            // چک می‌کنیم که آیا توکن وارد شده است یا خیر
+            
             if (token) {
                 const storedToken = localStorage.getItem('token');
                 
-                // اگر توکن قبلاً ذخیره شده باشد
+                
                 if (storedToken) {
-                    messageElement.textContent = 'توکن قبلاً ذخیره شده است';
+                    messageElement.textContent = 'توکن قبلا ثبت شده است';
                 } else {
                     // ذخیره کردن توکن در localStorage
                     localStorage.setItem('token', token);
