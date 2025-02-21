@@ -3,102 +3,83 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cloudflare Domain Checker</title>
+    <title>ثبت توکن</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; }
-        input, button { margin: 10px; padding: 10px; font-size: 16px; }
-        ul { text-align: left; max-width: 600px; margin: auto; }
-        .cloudflare { color: green; }
-        .not-cloudflare { color: red; }
-        .error { color: red; }
+        body {
+            background-color: black;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: white;
+        }
+        .token-box {
+            padding: 20px;
+            border-radius: 10px;
+            background-color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 300px;
+            text-align: center;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            background-color: #444;
+            color: white;
+        }
+        button {
+            padding: 10px;
+            border-radius: 5px;
+            background-color: #555;
+            border: none;
+            color: white;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
-    <h1>بررسی دامنه‌های Cloudflare از IP</h1>
-    <input type="number" id="count" placeholder="تعداد دامنه‌هایی که می‌خواهید تست کنید">
-    <button onclick="startCheck()">بررسی دامنه‌ها</button>
-    <ul id="resultList"></ul>
-    <p id="errorMsg" class="error" style="display: none;"></p>
+    <div class="token-box">
+        <h2>توکن</h2>
+        <input type="text" id="tokenInput" placeholder="توکن خود را وارد کنید">
+        <button onclick="saveToken()">ثبت</button>
+        <p id="message"></p>
+    </div>
 
     <script>
-        const cloudflareIPs = [
-            "173.245.48", "103.21.244", "198.41.128", "104.16", "104.24",
-            "2400:cb00::/32", "2606:4700::/32", "2803:f800::/32"
-        ];
-
-        // تابع برای انجام Reverse DNS Lookup برای یک IP
-        async function reverseDNSLookup(ip) {
-            try {
-                const response = await fetch(`https://dns.google/resolve?name=${ip}&type=PTR`, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/dns-json' }
-                });
-                const data = await response.json();
-                if (data.Answer) {
-                    return data.Answer.map(answer => answer.data);
+        function saveToken() {
+            const token = document.getElementById('tokenInput').value;
+            const messageElement = document.getElementById('message');
+            if (token) {
+                // چک می‌کنیم که آیا قبلاً توکن ذخیره شده است یا نه
+                const storedToken = localStorage.getItem('token');
+                if (storedToken) {
+                    messageElement.textContent = 'توکن قبلاً ذخیره شده است';
+                } else {
+                    // ذخیره کردن توکن در localStorage
+                    localStorage.setItem('token', token);
+                    messageElement.textContent = 'توکن ثبت شد';
                 }
-            } catch (e) {
-                console.error(`خطا در پیدا کردن دامنه‌ها برای ${ip}: ${e}`);
-                return [];
-            }
-            return [];
-        }
-
-        // تابع برای بررسی Cloudflare بودن دامنه
-        async function checkCloudflare(domain) {
-            const cloudflareIPs = ["173.245.48", "103.21.244", "198.41.128", "104.16", "104.24"];
-            try {
-                const response = await fetch(`https://cloudflare-dns.com/dns-query?name=${domain}&type=A`, {
-                    method: 'GET',
-                    headers: { 'Accept': 'application/dns-json' }
-                });
-                const data = await response.json();
-                if (data.Answer) {
-                    return data.Answer.some(answer => cloudflareIPs.some(cf => answer.data.startsWith(cf)));
-                }
-            } catch (e) {
-                console.error(`خطا در بررسی دامنه ${domain}: ${e}`);
-                return false;
-            }
-            return false;
-        }
-
-        // تابع برای شروع بررسی
-        async function startCheck() {
-            const count = parseInt(document.getElementById('count').value);
-            const resultList = document.getElementById('resultList');
-            const errorMsg = document.getElementById('errorMsg');
-            resultList.innerHTML = "در حال بررسی دامنه‌ها...";
-            errorMsg.style.display = 'none';
-
-            try {
-                if (isNaN(count) || count <= 0) {
-                    throw new Error("لطفاً تعداد معتبری وارد کنید.");
-                }
-
-                // برای هر IP از لیست Cloudflare دامنه‌ها رو پیدا می‌کنیم
-                let domains = [];
-                for (let ip of cloudflareIPs) {
-                    const domainList = await reverseDNSLookup(ip);
-                    domains = domains.concat(domainList);
-                    if (domains.length >= count) break;
-                }
-
-                resultList.innerHTML = "";
-
-                // بررسی اینکه دامنه متعلق به Cloudflare هست یا نه
-                for (let domain of domains.slice(0, count)) {
-                    const isCloudflare = await checkCloudflare(domain);
-                    const listItem = document.createElement('li');
-                    listItem.textContent = domain;
-                    listItem.classList.add(isCloudflare ? 'cloudflare' : 'not-cloudflare');
-                    resultList.appendChild(listItem);
-                }
-            } catch (e) {
-                errorMsg.textContent = e.message;
-                errorMsg.style.display = 'block';
+            } else {
+                messageElement.textContent = 'لطفاً توکن را وارد کنید';
             }
         }
+
+        // چک کردن که آیا توکن قبلاً ذخیره شده یا نه
+        window.onload = function() {
+            const storedToken = localStorage.getItem('token');
+            if (storedToken) {
+                document.getElementById('message').textContent = 'توکن قبلاً ذخیره شده است';
+            }
+        };
     </script>
 </body>
-</html>
+    </html>
+    
