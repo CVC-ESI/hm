@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> توکن</title>
+    <title>ثبت توکن</title>
     <style>
         body {
             background-color: black;
@@ -17,7 +17,7 @@
         }
         .token-box {
             padding: 20px;
-            border-radius: 25px; 
+            border-radius: 25px; /* بیضی شکل */
             background-color: #333;
             display: flex;
             flex-direction: column;
@@ -30,14 +30,14 @@
             padding: 10px;
             width: 80%;
             margin-bottom: 20px;
-            border-radius: 15px; 
+            border-radius: 15px; /* بیضی شکل */
             border: 1px solid #ccc;
             background-color: #444;
             color: white;
         }
         button {
             padding: 10px 20px;
-            border-radius: 15px;
+            border-radius: 15px; /* بیضی شکل */
             background-color: #555;
             border: none;
             color: white;
@@ -51,8 +51,8 @@
 </head>
 <body>
     <div class="token-box">
-        <h2>‌</h2>
-        <input type="text" id="tokenInput" placeholder="توکن">
+        <h2>توکن</h2>
+        <input type="text" id="tokenInput" placeholder="توکن خود را وارد کنید">
         <button onclick="saveToken()">ثبت</button>
         <p id="message"></p>
     </div>
@@ -62,29 +62,32 @@
             const token = document.getElementById('tokenInput').value;
             const messageElement = document.getElementById('message');
             
-            
             if (token) {
-                const storedToken = localStorage.getItem('token');
+                // دریافت آرایه توکن‌ها از localStorage (اگر وجود داشته باشد)
+                let tokens = JSON.parse(localStorage.getItem('tokens')) || [];
                 
-                
-                if (storedToken) {
-                    messageElement.textContent = 'توکن قبلا ثبت شده است';
+                // چک کردن اینکه آیا توکن جدید قبلاً ذخیره شده است یا نه
+                if (tokens.includes(token)) {
+                    messageElement.textContent = 'این توکن قبلاً ذخیره شده است';
                 } else {
-                    // ذخیره کردن توکن در localStorage
-                    localStorage.setItem('token', token);
-                    messageElement.textContent = 'توکن ثبت شد';
+                    // افزودن توکن جدید به آرایه
+                    tokens.push(token);
+                    // ذخیره آرایه به‌روز شده در localStorage
+                    localStorage.setItem('tokens', JSON.stringify(tokens));
+                    messageElement.textContent = 'توکن جدید ثبت شد';
                 }
             } else {
                 messageElement.textContent = 'لطفاً توکن را وارد کنید';
             }
         }
 
-        // چک می‌کنیم که آیا توکن قبلاً ذخیره شده است یا خیر
         window.onload = function() {
-            const storedToken = localStorage.getItem('token');
+            const tokens = JSON.parse(localStorage.getItem('tokens')) || [];
             const messageElement = document.getElementById('message');
-            if (storedToken) {
-                messageElement.textContent = 'توکن قبلاً ذخیره شده است';
+            
+            // اگر توکن‌ها ذخیره شده باشند، نمایش می‌دهیم که چند توکن ذخیره شده است
+            if (tokens.length > 0) {
+                messageElement.textContent = `تعداد ${tokens.length} توکن ذخیره شده است`;
             }
         };
     </script>
